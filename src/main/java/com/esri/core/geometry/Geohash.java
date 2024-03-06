@@ -22,58 +22,58 @@ public class Geohash {
      */
     public static Envelope2D geohashToEnvelope(String geoHash) {
         if (geoHash.length() > 24) {
-        throw new InvalidParameterException(GEOHASH_EXCEED_MAX_PRECISION_MESSAGE);
+        	throw new InvalidParameterException(GEOHASH_EXCEED_MAX_PRECISION_MESSAGE);
         }
 
         long latBits = 0;
         long lonBits = 0;
         for (int i = 0; i < geoHash.length(); i++) {
-        int pos = base32.indexOf(geoHash.charAt(i));
-        if (pos == -1) {
-            throw new InvalidParameterException(
-            new StringBuilder(INVALID_CHARACTER_MESSAGE)
-                .append('\'')
-                .append(geoHash.charAt(i))
-                .append('\'')
-                .toString()
-            );
+        	int pos = base32.indexOf(geoHash.charAt(i));
+        	if (pos == -1) {
+        	    throw new InvalidParameterException(
+        	    new StringBuilder(INVALID_CHARACTER_MESSAGE)
+        	        .append('\'')
+        	        .append(geoHash.charAt(i))
+        	        .append('\'')
+        	        .toString()
+        	    );
+        	}
+
+        	if (i % 2 == 0) {
+        	    lonBits =
+        	    (lonBits << 3) | ((pos >> 2) & 4) | ((pos >> 1) & 2) | (pos & 1);
+        	    latBits = (latBits << 2) | ((pos >> 2) & 2) | ((pos >> 1) & 1);
+        	} else {
+        	    latBits =
+        	    (latBits << 3) | ((pos >> 2) & 4) | ((pos >> 1) & 2) | (pos & 1);
+        	    lonBits = (lonBits << 2) | ((pos >> 2) & 2) | ((pos >> 1) & 1);
+        	}
         }
 
-        if (i % 2 == 0) {
-            lonBits =
-            (lonBits << 3) | ((pos >> 2) & 4) | ((pos >> 1) & 2) | (pos & 1);
-            latBits = (latBits << 2) | ((pos >> 2) & 2) | ((pos >> 1) & 1);
-        } else {
-            latBits =
-            (latBits << 3) | ((pos >> 2) & 4) | ((pos >> 1) & 2) | (pos & 1);
-            lonBits = (lonBits << 2) | ((pos >> 2) & 2) | ((pos >> 1) & 1);
-        }
-        }
+    	int lonBitsSize = (int) Math.ceil(geoHash.length() * 5 / 2.0);
+    	int latBitsSize = geoHash.length() * 5 - lonBitsSize;
 
-    int lonBitsSize = (int) Math.ceil(geoHash.length() * 5 / 2.0);
-    int latBitsSize = geoHash.length() * 5 - lonBitsSize;
+    	long one = 1;
 
-    long one = 1;
+    	double lat = -90;
+    	double latPrecision = 90;
+    	for (int i = 0; i < latBitsSize; i++) {
+    	  if (((one << (latBitsSize - 1 - i)) & latBits) != 0) {
+    	    lat += latPrecision;
+    	  }
+    	  latPrecision /= 2;
+    	}
 
-    double lat = -90;
-    double latPrecision = 90;
-    for (int i = 0; i < latBitsSize; i++) {
-      if (((one << (latBitsSize - 1 - i)) & latBits) != 0) {
-        lat += latPrecision;
-      }
-      latPrecision /= 2;
-    }
+    	double lon = -180;
+    	double lonPrecision = 180;
+    	for (int i = 0; i < lonBitsSize; i++) {
+    	  if (((one << (lonBitsSize - 1 - i)) & lonBits) != 0) {
+    	    lon += lonPrecision;
+    	  }
+    	  lonPrecision /= 2;
+    	}
 
-    double lon = -180;
-    double lonPrecision = 180;
-    for (int i = 0; i < lonBitsSize; i++) {
-      if (((one << (lonBitsSize - 1 - i)) & lonBits) != 0) {
-        lon += lonPrecision;
-      }
-      lonPrecision /= 2;
-    }
-
-        return new Envelope2D(
+    	return new Envelope2D(
 			lon,
 			lat,
 			lon + lonPrecision * 2,
@@ -91,7 +91,7 @@ public class Geohash {
 		if (characterLength < 1) {
 			throw new InvalidParameterException(
 				"CharacterLength cannot be less than 1"
-		);
+			);
 		}
 		if (characterLength > 24) {
 			throw new InvalidParameterException(GEOHASH_EXCEED_MAX_PRECISION_MESSAGE);
