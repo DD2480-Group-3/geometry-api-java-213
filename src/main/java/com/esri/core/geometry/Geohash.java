@@ -196,7 +196,7 @@ public class Geohash {
 		double deltaLon = 360;
 		double deltaLat = 180;
 
-		while (xmin == xmax && ymin == ymax && chars < 7) {
+		while (xmin == xmax && ymin == ymax && chars < 25) {
 			if (chars % 2 == 0) {
 				deltaLon = deltaLon / 8;
 				deltaLat = deltaLat / 4;
