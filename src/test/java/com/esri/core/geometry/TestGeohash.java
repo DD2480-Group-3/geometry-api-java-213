@@ -1,10 +1,10 @@
-	package com.esri.core.geometry;
+package com.esri.core.geometry;
 
-	import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-	import org.junit.Test;
+import org.junit.Test;
 
-	public class TestGeohash {
+public class TestGeohash {
 
 	/**
 	 * Check if the center of the new envelope is well placed
@@ -35,6 +35,20 @@
 		assertEquals(lon2, centerX2, delta);
 		assertEquals(lat2, centerY2, delta);
 	}
+
+	@Test
+  	public void testGeohashToEnvelopeWithLongGeohashes(){
+    	double delta = 0.00000001;
+    	double lon1 = -117.16176850225;
+    	double lat1 = 34.01274730565;
+    
+    	String geohash1 = "9qh9mzv6sgtkwz34";
+		Envelope2D env1 = Geohash.geohashToEnvelope(geohash1);
+    	double centerX1 = (env1.xmax + env1.xmin) * 0.5;
+    	double centerY1 = (env1.ymax + env1.ymin) * 0.5;
+    	assertEquals(lon1, centerX1, delta);
+    	assertEquals(lat1, centerY1, delta);
+  	}
 
 	/**
 	 * Check if the dimension of the new envelope is correct for low precision
@@ -196,4 +210,4 @@
 		assertEquals("1", coverage[2]);
 		assertEquals("3", coverage[3]);
 	}
-	}
+}
